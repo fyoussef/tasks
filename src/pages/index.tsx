@@ -1,9 +1,63 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
-import { Flex, Box, Text, Input, Button, InputGroup, InputRightElement } from '@chakra-ui/react'
-
+import { 
+  Flex, 
+  Box, 
+  Text, 
+  Input, 
+  Button,
+  InputGroup, 
+  InputRightElement,
+  VStack
+} from '@chakra-ui/react'
+import { useEffect, useState } from 'react'
+import { Tasks } from '../components/Tasks'
+import { useToast } from '@chakra-ui/react'
 
 const Home: NextPage = () => {
+
+  const [text, setText] = useState('')
+  const [tasks, setTasks] = useState<string[]>([])
+  const toast = useToast()
+
+  useEffect(() => {
+    const task = JSON.parse(localStorage.getItem('tasks') || '[]')
+    if (task.length > 0) {
+      setTasks(task)
+    }
+    
+  }, [])
+
+  function addTask() {
+
+    if (!text) {
+      toast({
+        title: 'Erro.',
+        description: "Não é possível adicionar tarefas vazias!",
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      })
+      return
+    }
+
+    localStorage.setItem('tasks', JSON.stringify([...tasks, text]))
+    
+    const task = JSON.parse(localStorage.getItem('tasks') || '[]')
+
+    setTasks(task)
+    setText('')
+
+    toast({
+      title: 'Sucesso.',
+      description: "Tarefa adicionada!",
+      status: 'success',
+      duration: 3000,
+      isClosable: true,
+    })
+
+  }
+
   return (
     <div>
       <Head>
@@ -16,6 +70,7 @@ const Home: NextPage = () => {
         justify='center'
         alignItems='center'
         mt='16'
+        flexDir='column'
       >
         <Box
           w={550}
@@ -24,6 +79,7 @@ const Home: NextPage = () => {
           px='8'
           py='8'
           rounded='2xl'
+          mb='8'
         >
           <Text 
             fontSize='3xl'
@@ -42,6 +98,8 @@ const Home: NextPage = () => {
               size='md'
               backgroundColor='white'
               color='black'
+              value={text}
+              onChange={e => setText(e.target.value)}
             />
             <InputRightElement
               w='5.5rem'
@@ -49,6 +107,7 @@ const Home: NextPage = () => {
               <Button 
                 colorScheme='teal' 
                 variant='solid'
+                onClick={addTask}
               >
                 Adicionar
               </Button>
@@ -56,6 +115,20 @@ const Home: NextPage = () => {
           </InputGroup>
 
         </Box>
+
+        <VStack>
+          {
+            tasks.map(task => {
+              return (
+                <Tasks 
+                  text={task}
+                  key={task}
+                />
+              )
+            })
+          }
+        </VStack>
+
       </Flex>
 
     </div>

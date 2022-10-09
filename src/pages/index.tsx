@@ -18,6 +18,7 @@ const Home: NextPage = () => {
 
   const [text, setText] = useState('')
   const [tasks, setTasks] = useState<string[]>([])
+  const [taskForEdit, setTaskForEdit] = useState<string>('')
   const toast = useToast()
 
   useEffect(() => {
@@ -25,7 +26,6 @@ const Home: NextPage = () => {
     if (task.length > 0) {
       setTasks(task)
     }
-    
   }, [])
 
   function addTask() {
@@ -40,12 +40,15 @@ const Home: NextPage = () => {
       })
       return
     }
-
+    
     localStorage.setItem('tasks', JSON.stringify([...tasks, text]))
     
-    const task = JSON.parse(localStorage.getItem('tasks') || '[]')
+    var allTasks: string[] = JSON.parse(localStorage.getItem('tasks') || '[]')
 
-    setTasks(task)
+    if (taskForEdit)
+      allTasks = allTasks.filter(item => item !== taskForEdit)
+
+    setTasks(allTasks)
     setText('')
 
     toast({
@@ -56,6 +59,13 @@ const Home: NextPage = () => {
       isClosable: true,
     })
 
+  }
+
+  function editTask(task: string) {
+    const allTasks = JSON.parse(localStorage.getItem('tasks') || '[]')
+    const selectedTask = allTasks.find((item: string) => item == task)
+    setText(selectedTask)
+    setTaskForEdit(selectedTask)
   }
 
   return (
@@ -118,11 +128,12 @@ const Home: NextPage = () => {
 
         <VStack>
           {
-            tasks.map(task => {
+            tasks.map((task, index) => {
               return (
                 <Tasks 
-                  text={task}
-                  key={task}
+                  task={task}
+                  key={index}
+                  editTask={editTask}
                 />
               )
             })

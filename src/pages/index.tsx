@@ -45,8 +45,11 @@ const Home: NextPage = () => {
     
     var allTasks: string[] = JSON.parse(localStorage.getItem('tasks') || '[]')
 
-    if (taskForEdit)
+    if (taskForEdit) {
       allTasks = allTasks.filter(item => item !== taskForEdit)
+      localStorage.setItem('tasks', JSON.stringify(allTasks))
+    }
+      
 
     setTasks(allTasks)
     setText('')
@@ -66,6 +69,14 @@ const Home: NextPage = () => {
     const selectedTask = allTasks.find((item: string) => item == task)
     setText(selectedTask)
     setTaskForEdit(selectedTask)
+  }
+
+  function removeTask(task: string) {
+    const allTasks = JSON.parse(localStorage.getItem('tasks') || '[]')
+    const filteredTasks = allTasks.filter((item: string) => item != task)
+
+    localStorage.setItem('tasks', JSON.stringify(filteredTasks))
+    setTasks(filteredTasks)
   }
 
   return (
@@ -134,6 +145,7 @@ const Home: NextPage = () => {
                   task={task}
                   key={index}
                   editTask={editTask}
+                  removeTask={removeTask}
                 />
               )
             })

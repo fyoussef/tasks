@@ -9,10 +9,11 @@ import { FaTrashAlt } from 'react-icons/fa'
 
 type TasksProps = {
     task: string,
-    editTask: (task: string) => void
+    editTask: (task: string) => void,
+    removeTask: (task: string) => void
 }
 
-export function Tasks({ task, editTask }: TasksProps) {
+export function Tasks({ task, editTask, removeTask }: TasksProps) {
     return (
         <Box
           w={550}
@@ -52,6 +53,7 @@ export function Tasks({ task, editTask }: TasksProps) {
                     _hover={{
                         bg: 'red.600'
                     }}
+                    onClick={() => removeTask(task)}
                 >
                     <FaTrashAlt />
                 </Button>
